@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "remotion studio src/index.ts",
-    "render": "npm run validate:audio && remotion render src/index.ts CosmicIntro out/cosmic-reels.mp4 --codec=h264 --crf=18",
+    "dev": "remotion studio src/index.ts --port=3111",
+    "render": "npm run validate:audio && remotion render src/index.ts CosmicIntro out/cosmic-reels.mp4 --codec=h264 --crf=18 --port=3111",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test \"src/lib/*.test.ts\"",
     "voiceover": "node --experimental-strip-types src/scripts/generate-voiceover.ts",

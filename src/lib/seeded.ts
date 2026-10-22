@@ -73,7 +73,7 @@ export const nebulaBlobs = (seed: number, count: number): Blob[] => {
     x: 0.1 + next() * 0.8,
     y: 0.05 + next() * 0.9,
     radius: 0.18 + next() * 0.34,
-    opacity: 0.35 + next() * 0.4,
+    opacity: 0.5 + next() * 0.45,
     tone: tones[Math.floor(next() * tones.length)] as Blob['tone'],
   }));
   if (blobs.length > 0) {
