@@ -1,16 +1,18 @@
-import type {NarrationEntry} from '../data/narration.ts';
-
 export type MissingAudio = {
-  id: string;
+  sceneId: string;
   file: string;
   path: string;
 };
 
 export const findMissingAudio = (
-  entries: NarrationEntry[],
+  entries: {sceneId: string; file: string}[],
   exists: (path: string) => boolean,
   resolve: (file: string) => string,
 ): MissingAudio[] =>
   entries
-    .filter((entry) => !exists(resolve(entry.audioFile)))
-    .map((entry) => ({id: entry.id, file: entry.audioFile, path: resolve(entry.audioFile)}));
+    .filter((entry) => !exists(resolve(entry.file)))
+    .map((entry) => ({
+      sceneId: entry.sceneId,
+      file: entry.file,
+      path: resolve(entry.file),
+    }));

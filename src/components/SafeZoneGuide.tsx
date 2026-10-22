@@ -1,22 +1,22 @@
 import React from 'react';
 import {AbsoluteFill, useVideoConfig} from 'remotion';
-import {withAlpha} from '../data/theme.ts';
+import {withAlpha} from '../theme/palette.ts';
 import {safeZone, subtitleBottomClearance} from '../lib/safeZone.ts';
-import type {Palette} from '../types.ts';
 
 export type SafeZoneGuideProps = {
-  palette: Palette;
+  accent: string;
+  text: string;
 };
 
-export const SafeZoneGuide: React.FC<SafeZoneGuideProps> = ({palette}) => {
+export const SafeZoneGuide: React.FC<SafeZoneGuideProps> = ({accent, text}) => {
   const {width, height} = useVideoConfig();
   const zone = safeZone(width, height);
   const clearance = subtitleBottomClearance(height);
-  const stroke = `1px dashed ${withAlpha(palette.solarCoral, 0.6)}`;
+  const stroke = `1px dashed ${withAlpha(accent, 0.55)}`;
   const label = {
-    fontSize: 22,
-    color: withAlpha(palette.solarCoral, 0.85),
-    fontFamily: '"Segoe UI", Arial, sans-serif',
+    fontSize: Math.max(16, width * 0.022),
+    color: withAlpha(accent, 0.8),
+    fontFamily: 'sans-serif',
   };
 
   return (
@@ -31,7 +31,9 @@ export const SafeZoneGuide: React.FC<SafeZoneGuideProps> = ({palette}) => {
           border: stroke,
         }}
       >
-        <span style={{position: 'absolute', top: -30, left: 0, ...label}}>SAFE ZONE</span>
+        <span style={{position: 'absolute', top: -label.fontSize * 1.6, left: 0, ...label}}>
+          SAFE ZONE
+        </span>
       </div>
       <div
         style={{
@@ -42,7 +44,7 @@ export const SafeZoneGuide: React.FC<SafeZoneGuideProps> = ({palette}) => {
           borderTop: stroke,
         }}
       >
-        <span style={{position: 'absolute', bottom: 8, left: 0, ...label}}>
+        <span style={{position: 'absolute', bottom: label.fontSize, left: 0, ...label}}>
           SUBTITLE CLEARANCE
         </span>
       </div>

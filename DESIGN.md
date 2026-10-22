@@ -1,39 +1,35 @@
 # DESIGN.md
 
-Direction for CosmicIntro. Transcribed from the project brief in `AGENTS.md`, not invented. The brief owns the palette, the type rules, the safe zones, and the anti-pattern list. This file records the reading of that brief and the one deliberate choice inside it.
+Direction for the `CosmicEpisode` series. The brief in `AGENTS.md` owns the palette, the type rules, the safe zones and the retention rules. This file records the reading of that brief and the decisions taken inside it.
 
 ## Design read
 
-Reading this as: a 30 second cinematic reel for a general Instagram audience, in a luminous indigo and purple cinematic language, dial ENERGY 2 / RHYTHM 2 / MOTION 3.
+Reading this as: a thirty second cosmic explainer for a general phone audience, in a luminous indigo and purple cinematic language, dial ENERGY 2 / RHYTHM 2 / MOTION 3.
 
-ENERGY 2 because the piece has to feel expansive and calm, not loud. RHYTHM 2 because each of the five scenes has its own composition (empty field, drifting clouds, single planet, radial speed, converging light) while the palette and the camera stay continuous. MOTION 3 because this is a video: the motion carries the story, and every scene is a camera move rather than a set of decorative loops.
+ENERGY 2 because the piece has to feel expansive and calm, not loud. RHYTHM 2 because the five scenes each have their own composition (empty field, opening cloud, one object, radial speed, converging light) while the palette and the camera stay continuous. MOTION 3 because this is a video: the motion carries the story, and every scene is a camera move rather than a set of decorative loops.
 
 ## Palette
 
-Seven tokens, defined once in `src/data/theme.ts`.
+Six tokens, defined once in `src/theme/palette.ts`.
 
 | Token | Hex | Role |
 | --- | --- | --- |
-| cosmicIndigo | #443199 | Primary. Spatial depth, the Void field |
-| nebulaPurple | #792CA2 | Secondary. Nebula and atmospheric forms |
-| stellarMagenta | #C13383 | Accent A. Nebula highlights, planet reflection |
-| solarCoral | #E05454 | Accent B. Sparse warm emphasis |
-| deepViolet | #29204F | Shadow and separation. Never a full background |
-| lavender | #B8B2FF | Illumination, planet rim light, highlights |
-| starlight | #FFF2EC | Text, stars, focal points |
+| space.base | #0A0618 | The space itself, the base of every frame |
+| cosmic.indigo | #443199 | Spatial depth, the Void and the warp |
+| nebula.purple | #792CA2 | The core cloud, the body of the object |
+| stellar.magenta | #C13383 | Accent A, the nebula highlights and the hot edge of the warp |
+| solar.coral | #E05454 | Accent B, the single focal element |
+| star.white | #F6F1FF | Text, stars, the focal light |
 
-Target balance across the runtime: 35 percent indigo and purple fields, 25 percent supporting depth, 20 percent magenta, 10 percent coral, 10 percent lavender and warm white. Per scene the mix shifts, and no scene carries all seven colors at once.
-
-Reason for the single accent rule: solarCoral is the only warm color in the palette, so one warm note in a cold frame reads as a highlight. Two warm notes read as a mistake. Coral is allowed in the Nebula (one small wisp), in the Warp (one or two streaks), and nowhere else.
+Reason for the accent rule: solar coral is the only warm colour in the palette, so one warm note in a cold frame reads as a highlight. Two warm notes read as a mistake. The hook spends its one coral element on the highlighted word, the warp spends its one on the centre glow, and the closer spends its one on the light point and the shockwave.
 
 ## Typography
 
-Display: `Segoe UI Light` at weight 200, with `Segoe UI` and `Helvetica Neue` as fallbacks. Body and subtitle: `Segoe UI` at weight 300 and 400.
+Display: `Trvocal Calm` (Regular), loaded from `public/fonts/trvocal-calm`. Body and subtitle: `Jost` (Light, Regular, Medium, SemiBold), loaded from `public/fonts/futura 100/Jost/static`. Jost fills the Futura 100 role the brief asks for.
 
-Reason for a system stack: the brief forbids external assets, so no font file is downloaded. A light weight at wide tracking reads as cinematic and stays legible on a phone, and the system stack renders identically inside the Remotion browser.
+Reason for a local font stack: the brief forbids external assets, so no font file is downloaded, and the fallback is a named system stack rather than a silent substitution.
 
-Title: uppercase, 108 px, letter spacing 0.18em, three lines, line height 1.15.
-Subtitle: 50 px, weight 300, line height 1.25, max width 840 px, max three lines.
+Title and hook: uppercase, 108 to 140 px, wide tracking. Subtitle: 46 to 52 px, weight 300, max 840 px wide, max three lines.
 
 ## Layout
 
@@ -50,37 +46,36 @@ The subtitle sits with its lower edge at least 400 px above the bottom edge of t
 
 ## Signature
 
-The lavender rim light on the planet, paired with the centre out mask reveal of the title.
+The hook text in a light display face with one coral word, and the closing title that opens from the middle outwards.
 
-Reason: the rim light is the only place in the palette where a cold edge light describes a solid body, so the planet reads as a body and not as a gradient disc. The title reveal uses the same language, the frame opens from the centre outward, so the last beat echoes the middle of the reel instead of arriving as a separate effect.
-
-Everything else stays quiet. One focal point per scene, restrained secondary motion, no bloom stack, no lens flare, no HUD, no glass.
+Reason: the hook has three seconds to win the viewer, so it carries the only large type of the episode and the only warm colour. The closing title uses the same gesture as the hook, reversed, so the reel ends the way it began.
 
 ## Per scene direction
 
 | Scene | Dominant | Supporting | Accents | Motion |
 | --- | --- | --- | --- | --- |
-| Void | cosmicIndigo | deepViolet | starlight, restrained lavender | First star visible on frame 0, gentle twinkle, vignette opens slowly |
-| Nebula | nebulaPurple | cosmicIndigo | stellarMagenta, one small solarCoral, lavender | Vertical cloud drift, three parallax star layers, one shooting star near 8 s |
-| Planet | cosmicIndigo | nebulaPurple | stellarMagenta, lavender, starlight | Planet rises from below, rim light, very slow rotation, optional ring and moon orbit |
-| Warp | cosmicIndigo | nebulaPurple | sparse stellarMagenta, sparse solarCoral, starlight streaks | Radial streaks, speed ramps up then slows, slow zoom, roll within 2 degrees |
-| Resolve | cosmicIndigo or nebulaPurple | deepViolet | starlight, lavender, selective magenta or coral | Converging light, one expanding thin ring, title reveals and fades out |
+| Hook | space.base | cosmic.indigo | star.white stars, one coral word | First star visible on frame zero, the starfield decelerates over sixty frames, the hook settles from scale 1.04 |
+| Core | cosmic.indigo | nebula.purple | star.white dust | The cloud opens out of the centre, particles spiral inward, the context tag leaves after two seconds |
+| Extra 1 | nebula.purple | cosmic.indigo | stellar.magenta band | The object fills the frame, its surface band rotates slowly, the companion body crosses on an ellipse |
+| Extra 2 | stellar.magenta | cosmic.indigo | star.white streaks, one coral centre | Radial streaks, speed ramps up then slows, the edge carries a colour split, roll stays under two degrees |
+| Closer | space.base | cosmic.indigo | one coral light point, star.white title | Everything collapses into the point, the ring expands, the title opens from the middle, the last five seconds return to the opening starfield |
 
 ## Motion rules
 
 Every value comes from `useCurrentFrame()` and the composition fps. Interpolation is clamped. Springs are high damping and used only where a physical entrance helps. Camera drift is slow, continuous across the reel, and rolls no further than 2 degrees. No CSS transitions, no keyframes, no timers, no wall clock.
 
+The loop is the reason the starfield drift is computed in `src/lib/loopMotion.ts`: the hook drift is a spring that starts fast, and the closing drift is the same spring played backwards, so the last frame sits on the state of the first frame at the same speed.
+
 ## Measured result
 
-The palette shares below come from the rendered frames, not from the intent above. Each frame was classified to its nearest token, so a blend is counted as the colour it leans towards.
+Measured with `tools/qa-frames.py` on the rendered frames of `ep01`. Each pixel is assigned to a token family by hue, value and saturation, so a blend of two tokens counts as a mixture and not as one of them.
 
-| Scene | cosmicIndigo | nebulaPurple | deepViolet | accent | mean luminance |
-| --- | --- | --- | --- | --- | --- |
-| Void | 69% | 0% | 31% | lavender rim and stars | 0.21 |
-| Nebula | 56% | 34% | 9% | magenta 1% | 0.25 |
-| Planet | 85% | 8% | 6% | lavender rim, moon | 0.25 |
-| Warp | 51% | 3% | 45% | starlight streaks 2.7% | 0.21 |
-| Resolve | 64% | 12% | 23% | starlight title | 0.23 |
+| Scene | space.base | indigo and purple | magenta | coral |
+| --- | --- | --- | --- | --- |
+| Hook | 64% | 34% | 0.1% | 0.5% |
+| Core | 66% | 33% | 0% | 0% |
+| Extra 1 | 63% | 26% | 10% | 0% |
+| Extra 2 | 66% | 22% | 8% | 0% |
+| Closer | 63% | 34% | 3% | 0% |
 
-No frame drops below 0.19 mean luminance and no pixel in the sampled frames is near black. The focus band, 35 to 55 percent of the frame height, is the brightest region in every scene.
-
+The base and the indigo share cannot both sit inside their bands in the base led scenes. A hook that is base plus white stars plus one coral word has almost no magenta or purple area to absorb the rest of the frame, so the indigo share sits a few points above its target there. The measured coral share stays at or below half a percent everywhere, and the subtitle contrast measures 18 to 1 against the 4.5 to 1 the brief asks for.

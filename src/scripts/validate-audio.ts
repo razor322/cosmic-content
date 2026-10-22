@@ -1,62 +1,62 @@
-import {existsSync, readFileSync, statSync} from 'node:fs';
+import {existsSync, readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
-import {narration} from '../data/narration.ts';
+import {episodes, type SceneId} from '../data/episodes.ts';
 import {findMissingAudio} from '../lib/audioFiles.ts';
 import {checkAudioSlot} from '../lib/audioSlots.ts';
+import {parseMp3Duration} from '../lib/mp3Duration.ts';
+import {audioSlot} from '../lib/timeline.ts';
 
 const FPS = 30;
+const SCENES: SceneId[] = ['hook', 'core', 'add1', 'add2', 'closer'];
 
-const missing = findMissingAudio(
-  narration,
-  (path) => existsSync(path),
-  (file) => resolve('public/voiceover', file),
-);
+const requested = process.argv
+  .filter((argument) => argument.startsWith('--episode='))
+  .map((argument) => argument.split('=')[1]);
+const selected = requested.length
+  ? episodes.filter((episode) => requested.includes(episode.id))
+  : episodes;
 
-if (missing.length > 0) {
-  console.error('Missing voiceover files:');
-  for (const item of missing) {
-    console.error(`  scene "${item.id}": ${item.path}`);
-  }
-  console.error('Run "npm run voiceover" to generate them.');
-  process.exit(1);
-}
+let problems = 0;
 
-const {parseMp3Duration} = await import('../lib/mp3Duration.ts');
-let overlong = 0;
-let unreadable = 0;
+for (const episode of selected) {
+  const entries = SCENES.map((scene) => ({
+    sceneId: scene,
+    file: `${scene}.mp3`,
+  }));
+  const resolvePath = (file: string) =>
+    resolve('public/voiceover', episode.id, file);
 
-for (const entry of narration) {
-  const path = resolve('public/voiceover', entry.audioFile);
-  const bytes = readFileSync(path);
-  const seconds = parseMp3Duration(bytes);
-
-  if (seconds === null) {
-    unreadable += 1;
-    console.warn(`${entry.id}: ${entry.audioFile} could not be measured (${statSync(path).size} bytes)`);
+  const missing = findMissingAudio(entries, (path) => existsSync(path), resolvePath);
+  if (missing.length > 0) {
+    problems += missing.length;
+    console.error(`${episode.id}: missing voiceover files`);
+    for (const item of missing) {
+      console.error(`  scene "${item.sceneId}": ${item.path}`);
+    }
     continue;
   }
 
-  const check = checkAudioSlot(entry, seconds, FPS);
-  const size = statSync(path).size;
-  if (check.overlong) {
-    overlong += 1;
-    console.warn(`${check.message} (${size} bytes)`);
-    console.warn(`  The voiceover is not cut short: it plays past its slot and into the next scene.`);
-  } else {
-    console.log(`${check.message} (${size} bytes)`);
+  for (const entry of entries) {
+    const seconds = parseMp3Duration(readFileSync(resolvePath(entry.file)));
+    if (seconds === null) {
+      problems += 1;
+      console.error(`${episode.id}/${entry.sceneId}: could not be measured`);
+      continue;
+    }
+    const slot = audioSlot(entry.sceneId as SceneId);
+    const check = checkAudioSlot(entry.sceneId, seconds, slot.durationInFrames, FPS);
+    if (check.overlong) {
+      problems += 1;
+      console.warn(check.message);
+    } else {
+      console.log(`${episode.id}: ${check.message}`);
+    }
   }
 }
 
-if (unreadable > 0) {
+if (problems > 0) {
   console.error(
-    `${unreadable} voiceover file(s) could not be measured. Rendering is stopped because the slot fit is unknown.`,
-  );
-  process.exit(1);
-}
-
-if (overlong > 0) {
-  console.error(
-    `${overlong} voiceover file(s) exceed their slot. Shorten the line in src/data/narration.ts or extend the slot.`,
+    `${problems} voiceover problem(s) found. Shorten the line in src/data/episodes.ts or give the scene more frames.`,
   );
   process.exit(1);
 }

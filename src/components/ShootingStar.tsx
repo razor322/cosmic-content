@@ -17,10 +17,10 @@ export const ShootingStar: React.FC<ShootingStarProps> = ({startFrame, color, le
     return null;
   }
   const progress = local / TRAVEL_FRAMES;
-  const fromX = width * 0.82;
-  const fromY = height * 0.14;
-  const toX = width * 0.26;
-  const toY = height * 0.38;
+  const fromX = width * 0.84;
+  const fromY = height * 0.16;
+  const toX = width * 0.24;
+  const toY = height * 0.4;
   const headX = fromX + (toX - fromX) * progress;
   const headY = fromY + (toY - fromY) * progress;
   const angle = Math.atan2(toY - fromY, toX - fromX);

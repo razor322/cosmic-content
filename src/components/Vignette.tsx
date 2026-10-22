@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill} from 'remotion';
-import {withAlpha} from '../data/theme.ts';
+import {radialVignette} from '../lib/gradients.ts';
 
 export type VignetteProps = {
   color: string;
@@ -11,7 +11,7 @@ export type VignetteProps = {
 export const Vignette: React.FC<VignetteProps> = ({color, strength, openRatio}) => (
   <AbsoluteFill
     style={{
-      background: `radial-gradient(ellipse ${openRatio}% at 50% 45%, ${withAlpha(color, 0)} 28%, ${withAlpha(color, strength)} 100%)`,
+      background: radialVignette(color, strength, openRatio),
       pointerEvents: 'none',
     }}
   />

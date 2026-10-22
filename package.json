@@ -1,18 +1,21 @@
 {
   "name": "remotion-konten",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "remotion studio src/index.ts --port=3111",
-    "render": "npm run validate:audio && remotion render src/index.ts CosmicIntro out/cosmic-reels.mp4 --codec=h264 --crf=18 --port=3111",
+    "render": "remotion render src/index.ts ep01 out/ep01.mp4 --codec=h264 --crf=18 --port=3111 --gl=angle",
+    "render:all": "node --experimental-strip-types src/scripts/render-all.ts",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test \"src/lib/*.test.ts\"",
+    "sfx": "node --experimental-strip-types src/scripts/generate-sfx.ts",
     "voiceover": "node --experimental-strip-types src/scripts/generate-voiceover.ts",
     "validate:audio": "node --experimental-strip-types src/scripts/validate-audio.ts"
   },
   "dependencies": {
     "@remotion/cli": "4.0.537",
+    "@remotion/fonts": "4.0.537",
     "@remotion/media": "4.0.537",
     "@remotion/media-utils": "4.0.537",
     "react": "19.3.1",

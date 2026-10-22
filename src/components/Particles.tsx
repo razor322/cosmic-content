@@ -18,9 +18,9 @@ export const Particles: React.FC<ParticlesProps> = ({seed, count, color, drift})
     return Array.from({length: count}, () => ({
       x: next(),
       y: next(),
-      size: 1.2 + next() * 2.8,
+      size: 1.4 + next() * 3.2,
       speed: drift * (0.4 + next() * 0.6),
-      alpha: 0.12 + next() * 0.34,
+      alpha: 0.14 + next() * 0.32,
     }));
   }, [seed, count, drift]);
 

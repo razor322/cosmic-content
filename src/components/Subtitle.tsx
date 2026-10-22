@@ -1,28 +1,34 @@
 import React from 'react';
 import {useCurrentFrame, useVideoConfig} from 'remotion';
-import {withAlpha} from '../data/theme.ts';
+import {withAlpha} from '../theme/palette.ts';
 import {
   subtitleBottomClearance,
   subtitleFontSize,
   subtitleMaxWidth,
 } from '../lib/safeZone.ts';
-import {subtitleStateAt} from '../lib/subtitle.ts';
-import type {NarrationEntry, Palette} from '../types.ts';
+import {subtitleStateAt, type SubtitleSlot} from '../lib/subtitle.ts';
+import {BODY_FONT} from '../theme/fonts.ts';
 
 export type SubtitleProps = {
-  entries: NarrationEntry[];
-  palette: Palette;
+  slots: SubtitleSlot[];
+  palette: {
+    'star.white': string;
+    'space.base': string;
+  };
 };
 
-const BODY_FONT = '"Segoe UI", "Helvetica Neue", Arial, sans-serif';
-
-export const Subtitle: React.FC<SubtitleProps> = ({entries, palette}) => {
+/**
+ * The spoken line of a scene. It stays inside the safe zone and keeps a
+ * readable contrast over a bright cloud.
+ */
+export const Subtitle: React.FC<SubtitleProps> = ({slots, palette}) => {
   const frame = useCurrentFrame();
   const {width, height} = useVideoConfig();
-  const state = subtitleStateAt(frame, entries);
+  const state = subtitleStateAt(frame, slots);
   if (!state || state.opacity <= 0) {
     return null;
   }
+
   return (
     <div
       style={{
@@ -46,20 +52,20 @@ export const Subtitle: React.FC<SubtitleProps> = ({entries, palette}) => {
         <div
           style={{
             position: 'absolute',
-            inset: '-70px -90px',
-            background: `linear-gradient(to top, ${withAlpha(palette.deepViolet, 0.55)}, transparent)`,
+            inset: '-80px -100px',
+            background: `linear-gradient(to top, ${withAlpha(palette['space.base'], 0.6)}, transparent)`,
           }}
         />
         <div
           style={{
             position: 'relative',
-            fontSize: subtitleFontSize(width),
-            lineHeight: 1.25,
-            fontWeight: 300,
-            textAlign: 'center',
-            color: palette.starlight,
             fontFamily: BODY_FONT,
-            textShadow: `0 2px 24px ${withAlpha(palette.deepViolet, 0.9)}`,
+            fontSize: subtitleFontSize(width),
+            fontWeight: 300,
+            lineHeight: 1.25,
+            textAlign: 'center',
+            color: palette['star.white'],
+            textShadow: `0 2px 26px ${withAlpha(palette['space.base'], 0.95)}`,
           }}
         >
           {state.text}

@@ -1,7 +1,5 @@
-import type {NarrationEntry} from '../data/narration.ts';
-
 export type SlotCheck = {
-  id: string;
+  sceneId: string;
   allowedSeconds: number;
   measuredSeconds: number;
   overlong: boolean;
@@ -9,14 +7,15 @@ export type SlotCheck = {
 };
 
 export const checkAudioSlot = (
-  entry: NarrationEntry,
+  sceneId: string,
   measuredSeconds: number,
+  allowedFrames: number,
   fps: number,
 ): SlotCheck => {
-  const allowedSeconds = (entry.endFrame - entry.startFrame) / fps;
+  const allowedSeconds = allowedFrames / fps;
   const overlong = measuredSeconds > allowedSeconds;
   const message = overlong
-    ? `Voiceover "${entry.id}" runs ${measuredSeconds.toFixed(2)}s but its slot allows ${allowedSeconds.toFixed(2)}s. Shorten the line or move the slot in src/data/narration.ts.`
-    : `Voiceover "${entry.id}" fits its slot: ${measuredSeconds.toFixed(2)}s of ${allowedSeconds.toFixed(2)}s.`;
-  return {id: entry.id, allowedSeconds, measuredSeconds, overlong, message};
+    ? `Voiceover "${sceneId}" runs ${measuredSeconds.toFixed(2)}s but its slot allows ${allowedSeconds.toFixed(2)}s. Shorten the line in src/data/episodes.ts or give the scene more frames.`
+    : `Voiceover "${sceneId}" fits its slot: ${measuredSeconds.toFixed(2)}s of ${allowedSeconds.toFixed(2)}s.`;
+  return {sceneId, allowedSeconds, measuredSeconds, overlong, message};
 };
