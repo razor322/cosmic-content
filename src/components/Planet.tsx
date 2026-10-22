@@ -78,8 +78,8 @@ export const Planet: React.FC<PlanetProps> = ({
               ry={ringRy}
               fill="none"
               stroke={palette.lavender}
-              strokeOpacity={0.26}
-              strokeWidth={width * 0.005}
+              strokeOpacity={0.4}
+              strokeWidth={width * 0.007}
             />
           </g>
         ) : null}
@@ -124,16 +124,16 @@ export const Planet: React.FC<PlanetProps> = ({
               d={`M ${cx + ringRx} ${cy} A ${ringRx} ${ringRy} 0 0 0 ${cx - ringRx} ${cy}`}
               fill="none"
               stroke={palette.lavender}
-              strokeOpacity={0.42}
-              strokeWidth={width * 0.005}
+              strokeOpacity={0.62}
+              strokeWidth={width * 0.007}
             />
           </g>
         ) : null}
 
         <g transform={`rotate(-18 ${cx} ${cy})`}>
           <circle
-            cx={cx + Math.cos(moonAngle) * radius * 1.5}
-            cy={cy + Math.sin(moonAngle) * radius * 0.45}
+            cx={cx + Math.cos(moonAngle) * radius * 1.2}
+            cy={cy + Math.sin(moonAngle) * radius * 0.4}
             r={width * 0.014}
             fill={palette.starlight}
             opacity={0.9}

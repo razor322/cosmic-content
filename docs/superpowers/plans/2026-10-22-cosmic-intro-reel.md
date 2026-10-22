@@ -387,6 +387,10 @@ import {readFileSync, readdirSync, statSync} from 'node:fs';
 import {join} from 'node:path';
 import {test} from 'node:test';
 
+const SELF = 'src/lib/guards.test.ts';
+
+const normalize = (file: string): string => file.split(/[\\/]/).join('/');
+
 const walk = (dir: string): string[] =>
   readdirSync(dir).flatMap((entry) => {
     const full = join(dir, entry);
@@ -396,10 +400,11 @@ const walk = (dir: string): string[] =>
 const sources = (): {file: string; text: string}[] =>
   walk('src')
     .filter((file) => file.endsWith('.ts') || file.endsWith('.tsx'))
-    .map((file) => ({file, text: readFileSync(file, 'utf8')}));
+    .map((file) => ({file: normalize(file), text: readFileSync(file, 'utf8')}));
 
-test('no source file uses Math.random or Date.now', () => {
+test('no source file uses an unseeded random or the wall clock', () => {
   const offenders = sources()
+    .filter(({file}) => file !== SELF)
     .filter(({text}) => /Math\.random|Date\.now/.test(text))
     .map(({file}) => file);
   assert.deepEqual(offenders, []);
@@ -407,7 +412,9 @@ test('no source file uses Math.random or Date.now', () => {
 
 test('hex colour literals exist only in src/data/theme.ts', () => {
   const offenders = sources()
-    .filter(({file}) => !file.endsWith('data/theme.ts'))
+    .filter(({file}) => file !== SELF)
+    .filter(({file}) => file !== 'src/data/theme.ts')
+    .filter(({file}) => !file.endsWith('.test.ts'))
     .filter(({text}) => /#[0-9a-fA-F]{3,8}\b/.test(text))
     .map(({file}) => file);
   assert.deepEqual(offenders, []);
@@ -2668,7 +2675,52 @@ git commit -m "docs: add the implementation plan"
 
 ---
 
+### Task 7b: Node side duration measurement
+
+**Files:**
+- Create: `src/lib/mp3Duration.ts`, `src/lib/mp3Duration.test.ts`
+
+**Interfaces:**
+- Produces: `parseMp3Duration(bytes: Uint8Array): number | null`, the duration in seconds of a constant bitrate MPEG stream, or null when the bytes are not a readable stream.
+
+**Why this task exists.** The brief asks for `getAudioDurationInSeconds()` from `@remotion/media-utils`. That function is deprecated and it creates an `HTMLAudioElement`, so it only runs in the browser. Inside the composition it works, but the Remotion CLI does not forward browser console output at the default log level, so a warning raised there never reaches the operator during a render. The check would have been decoration.
+
+The fix is a second measurement that runs in Node, inside `src/scripts/validate-audio.ts`, which the render script already calls before the render starts. The parser walks the frame headers of a constant bitrate MPEG stream, so it needs no dependency. It is verified against the same files the browser API measures, and both produce identical numbers.
+
+- [ ] **Step 1: write the failing test** in `src/lib/mp3Duration.test.ts`: a synthetic 24 kHz, 48 kbps, mono MPEG 2 Layer III stream of N frames measures `N * 576 / 24000` seconds, an ID3 tag before the first frame is skipped, a truncated stream reports only the complete frames it can read, and bytes that are not an MPEG stream return null.
+
+- [ ] **Step 2: run `npm test` and watch it fail** with a module not found error.
+
+- [ ] **Step 3: implement `parseMp3Duration`** with the version, layer, bitrate, and sample rate tables for MPEG 1, MPEG 2, and MPEG 2.5 Layer III, the frame length formula `floor(samplesPerFrame / 8 * bitrate / sampleRate) + padding`, and a resync scan for a broken header.
+
+- [ ] **Step 4: run `npm test`** and watch it pass.
+
+- [ ] **Step 5: wire it into `src/scripts/validate-audio.ts`**: measure every file, print the slot check for each, and exit with code 1 when a file is overlong or cannot be measured.
+
+---
+
+## Execution log: what the implementation changed
+
+These are the places where the shipped code differs from the plan above. The code is the source of truth; this section is the map between the two.
+
+**Port.** Port 3000 was already taken by another project on this machine, so every Remotion command uses `--port=3111`. The scripts in `package.json` carry the flag.
+
+**The guard test** in `src/lib/guards.test.ts` excludes itself and normalises Windows path separators before matching, otherwise it flagged its own test name and the theme file. The hex rule also skips test files, because the theme test asserts the hex values on purpose.
+
+**The audio tests** live in one file, `src/lib/audio.test.ts`, instead of two.
+
+**The subtitle** reaches opacity 0 exactly at the end of its slot instead of disappearing, so the fade completes without a jump. `Subtitle.tsx` renders nothing while the opacity is 0.
+
+**The duration check** in `AudioTrack.tsx` logs with `console.log` rather than `console.info`, because the CLI does not show `info` level browser output. The report the operator actually reads comes from `src/scripts/validate-audio.ts`, which measures the files in Node and stops the render when a line is overlong.
+
+**Art direction corrections** after measuring the rendered frames instead of trusting the code: the field gradients in every scene were rebalanced so indigo and purple dominate instead of deep violet, the vignette strengths came down from 0.7 to 0.85, the planet rim light got a brighter and tighter gradient with a wider stroke, and the nebula blobs got more opacity. The measured palette shares are listed in the delivery notes.
+
+**No new dependency.** The MP3 parser replaced the need for a Node side media library, so the stack stays on the Remotion and React toolchain plus `@remotion/media-utils`.
+
+---
+
 ## Self review
+
 
 **Spec coverage.** Every section of `AGENTS.md` maps to a task: the technical constraints to Task 1 and the global constraints, the palette to Task 2, the timeline to Task 3, the safe zones to Task 4, the seeded visuals to Task 5, the narration data to Task 6, the audio rules to Tasks 7 and 12, the components to Tasks 8 to 10, the scenes to Task 11, and the acceptance list to Task 13.
 

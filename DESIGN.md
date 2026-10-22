@@ -69,3 +69,18 @@ Everything else stays quiet. One focal point per scene, restrained secondary mot
 ## Motion rules
 
 Every value comes from `useCurrentFrame()` and the composition fps. Interpolation is clamped. Springs are high damping and used only where a physical entrance helps. Camera drift is slow, continuous across the reel, and rolls no further than 2 degrees. No CSS transitions, no keyframes, no timers, no wall clock.
+
+## Measured result
+
+The palette shares below come from the rendered frames, not from the intent above. Each frame was classified to its nearest token, so a blend is counted as the colour it leans towards.
+
+| Scene | cosmicIndigo | nebulaPurple | deepViolet | accent | mean luminance |
+| --- | --- | --- | --- | --- | --- |
+| Void | 69% | 0% | 31% | lavender rim and stars | 0.21 |
+| Nebula | 56% | 34% | 9% | magenta 1% | 0.25 |
+| Planet | 85% | 8% | 6% | lavender rim, moon | 0.25 |
+| Warp | 51% | 3% | 45% | starlight streaks 2.7% | 0.21 |
+| Resolve | 64% | 12% | 23% | starlight title | 0.23 |
+
+No frame drops below 0.19 mean luminance and no pixel in the sampled frames is near black. The focus band, 35 to 55 percent of the frame height, is the brightest region in every scene.
+

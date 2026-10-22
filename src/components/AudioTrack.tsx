@@ -27,7 +27,7 @@ export const AudioTrack: React.FC<AudioTrackProps> = ({entries, voiceVolume, amb
           if (check.overlong) {
             console.warn(check.message);
           } else {
-            console.info(check.message);
+            console.log(check.message);
           }
         })
         .catch((error: unknown) => {
